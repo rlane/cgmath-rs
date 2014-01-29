@@ -10,13 +10,13 @@ The library provides:
 - square matrices: `Mat2`, `Mat3`, `Mat4`
 - a quaternion type: `Quat`
 - rotation matrices: `Rot2`, `Rot3`
-- rotations: `Euler`, `AxisAngle`
 - angle units: `Rad`, `Deg`
 - points: `Point2`, `Point3`
 - rays: `Ray2`, `Ray3`
-- plane: `Plane`
+- a plane type: `Plane`
 - perspective projections: `Perspective`, `PerspectiveFov`, `Ortho`
 - a view frustum: `Frustrum`
+- spatial transformations: `AffineMatrix3`, `Transform3D`
 - axis-aligned bounding boxes: `Aabb2`, `Aabb3`
 - oriented bounding boxes: `Obb2`, `Obb3`
 - collision primitives: `Sphere`, `Cylinder`
@@ -28,8 +28,29 @@ pull request with a fix.
 
 ## Compilation
 
+### Building the library
+
 ~~~
-rustpkg build cgmath
+mkdir -p lib
+rustc --out-dir lib ./src/cgmath/lib.rs
+~~~
+
+### Running the tests
+
+~~~
+mkdir -p lib bin
+rustc --out-dir lib ./src/cgmath/lib.rs
+rustc --out-dir bin --test -L ./lib ./src/test/test.rs
+./bin/test
+~~~
+
+### Running the benchmarks
+
+~~~
+mkdir -p lib bin
+rustc --out-dir lib ./src/cgmath/lib.rs
+rustc --out-dir bin --test -L ./lib ./src/test/test.rs
+./bin/bench --bench
 ~~~
 
 ## Limitations
@@ -39,11 +60,7 @@ applications rather than general linear algebra. It only offers the 2, 3, and
 4 dimensional structures that are more than useful for most computer graphics
 applications. This design decision was made in order to simplify the
 implementation (Rust cannot paramerise over constants at compile time), and to
-make dimension-specific optimisations easier in the future. Those looking for
-n-dimensional mathematics can look to [nalgebra](https://github.com/sebcrozet/nalgebra).
-
-Currently, operators are not overloaded. This is due to limitations in Rust's
-generics that will be fixed sometime in the future.
+make dimension-specific optimisations easier in the future.
 
 ## Contributing
 

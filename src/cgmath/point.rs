@@ -18,30 +18,25 @@
 //! not have a fixed position.
 
 use std::fmt;
-use std::num::{one,zero};
+use std::num::{one, zero};
 
 use array::*;
 use vector::*;
 
 /// A point in 2-dimensional space.
-#[deriving(Eq, Zero, Clone)]
+#[deriving(Eq, Clone, IterBytes)]
 pub struct Point2<S> { x: S, y: S }
 
 /// A point in 3-dimensional space.
-#[deriving(Eq, Zero, Clone)]
+#[deriving(Eq, Clone, IterBytes)]
 pub struct Point3<S> { x: S, y: S, z: S }
 
-approx_eq!(impl<S> Point2<S>)
-approx_eq!(impl<S> Point3<S>)
 
 impl<S: Num> Point2<S> {
     #[inline]
     pub fn new(x: S, y: S) -> Point2<S> {
         Point2 { x: x, y: y }
     }
-
-    #[inline]
-    pub fn origin() -> Point2<S> { zero() }
 }
 
 impl<S: Num> Point3<S> {
@@ -49,9 +44,6 @@ impl<S: Num> Point3<S> {
     pub fn new(x: S, y: S, z: S) -> Point3<S> {
         Point3 { x: x, y: y, z: z }
     }
-
-    #[inline]
-    pub fn origin() -> Point3<S> { zero() }
 }
 
 impl<S: Clone + Num + Primitive> Point3<S> {
@@ -76,6 +68,8 @@ pub trait Point
 >
 :   Array<S, Slice>
 {
+    #[inline] fn origin() -> Self{ build(|_i| zero::<S>()) }
+
     #[inline] fn from_vec(v: &V) -> Self { build(|i| v.i(i).clone()) }
     #[inline] fn to_vec(&self) -> V { build(|i| self.i(i).clone()) }
 

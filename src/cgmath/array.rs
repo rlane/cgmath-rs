@@ -15,7 +15,7 @@
 
 #[macro_escape];
 
-use std::vec::{VecIterator, VecMutIterator};
+use std::vec::{Items, MutItems};
 
 pub trait Array
 <
@@ -29,8 +29,8 @@ pub trait Array
     fn as_mut_slice<'a>(&'a mut self) -> &'a mut Slice;
     fn from_slice(slice: Slice) -> Self;
     fn build(builder: |i: uint| -> T) -> Self;
-    fn iter<'a>(&'a self) -> VecIterator<'a, T>;
-    fn mut_iter<'a>(&'a mut self) -> VecMutIterator<'a, T>;
+    fn iter<'a>(&'a self) -> Items<'a, T>;
+    fn mut_iter<'a>(&'a mut self) -> MutItems<'a, T>;
 
     /// Swap two elements of the type in place.
     #[inline]
@@ -78,12 +78,12 @@ macro_rules! array(
             }
 
             #[inline]
-            fn iter<'a>(&'a self) -> ::std::vec::VecIterator<'a, $T> {
+            fn iter<'a>(&'a self) -> ::std::vec::Items<'a, $T> {
                 self.as_slice().iter()
             }
 
             #[inline]
-            fn mut_iter<'a>(&'a mut self) -> ::std::vec::VecMutIterator<'a, $T> {
+            fn mut_iter<'a>(&'a mut self) -> ::std::vec::MutItems<'a, $T> {
                 self.as_mut_slice().mut_iter()
             }
 
@@ -123,26 +123,3 @@ macro_rules! gen_each_mut(
     (_4) => ({ f(0, self.mut_i(0)); f(1, self.mut_i(1)); f(2, self.mut_i(2)); f(3, self.mut_i(3)); });
 )
 
-macro_rules! approx_eq(
-    (impl<$S:ident> $Self:ty) => (
-        impl<$S: Clone + ApproxEq<$S>> ApproxEq<$S> for $Self {
-            #[inline]
-            fn approx_epsilon() -> $S {
-                // TODO: fix this after static methods are fixed in rustc
-                fail!(~"Doesn't work!");
-            }
-
-            #[inline]
-            fn approx_eq(&self, other: &$Self) -> bool {
-                self.iter().zip(other.iter())
-                           .all(|(a, b)| a.approx_eq(b))
-            }
-
-            #[inline]
-            fn approx_eq_eps(&self, other: &$Self, approx_epsilon: &$S) -> bool {
-                self.iter().zip(other.iter())
-                           .all(|(a, b)| a.approx_eq_eps(b, approx_epsilon))
-            }
-        }
-    )
-)

@@ -17,6 +17,7 @@ use std::fmt;
 use std::num::{zero, one, cast, sqrt};
 
 use angle::{Angle, Rad, acos, cos, sin, sin_cos};
+use approx::ApproxEq;
 use array::{Array, build};
 use matrix::{Mat3, ToMat3};
 use vector::{Vec3, Vector, EuclideanVector};
@@ -26,13 +27,13 @@ use vector::{Vec3, Vector, EuclideanVector};
 pub struct Quat<S> { s: S, v: Vec3<S> }
 
 array!(impl<S> Quat<S> -> [S, ..4] _4)
-approx_eq!(impl<S> Quat<S>)
 
 pub trait ToQuat<S: Float> {
     fn to_quat(&self) -> Quat<S>;
 }
 
-impl<S: Float> Quat<S> {
+impl<S: Float + ApproxEq<S>>
+Quat<S> {
     /// Construct a new quaternion from one scalar component and three
     /// imaginary components
     #[inline]
@@ -46,27 +47,25 @@ impl<S: Float> Quat<S> {
         Quat { s: s, v: v }
     }
 
-    #[inline]
-    pub fn look_at(dir: &Vec3<S>, up: &Vec3<S>) -> Quat<S> {
-        Mat3::look_at(dir, up).to_quat()
-    }
-
-    /// Create a matrix from a rotation around the `x` axis (pitch).
+    /// Create a quaternion from a rotation around the `x` axis (pitch).
     #[inline]
     pub fn from_angle_x(theta: Rad<S>) -> Quat<S> {
-        Quat::new(cos(theta.mul_s(cast(0.5).unwrap())), sin(theta), zero(), zero())
+        let (s, c) = sin_cos(theta.mul_s(cast(0.5).unwrap()));
+        Quat::new(c, s, zero(), zero())
     }
 
-    /// Create a matrix from a rotation around the `y` axis (yaw).
+    /// Create a quaternion from a rotation around the `y` axis (yaw).
     #[inline]
     pub fn from_angle_y(theta: Rad<S>) -> Quat<S> {
-        Quat::new(cos(theta.mul_s(cast(0.5).unwrap())), zero(), sin(theta), zero())
+        let (s, c) = sin_cos(theta.mul_s(cast(0.5).unwrap()));
+        Quat::new(c, zero(), s, zero())
     }
 
-    /// Create a matrix from a rotation around the `z` axis (roll).
+    /// Create a quaternion from a rotation around the `z` axis (roll).
     #[inline]
     pub fn from_angle_z(theta: Rad<S>) -> Quat<S> {
-        Quat::new(cos(theta.mul_s(cast(0.5).unwrap())), zero(), zero(), sin(theta))
+        let (s, c) = sin_cos(theta.mul_s(cast(0.5).unwrap()));
+        Quat::new(c, zero(), zero(), s)
     }
 
     /// Create a quaternion from a set of euler angles.
@@ -220,7 +219,8 @@ impl<S: Float> Quat<S> {
     }
 }
 
-impl<S: Float> Quat<S> {
+impl<S: Float + ApproxEq<S>>
+Quat<S> {
     /// Spherical Linear Intoperlation
     ///
     /// Perform a spherical linear interpolation between the quaternion and
@@ -265,7 +265,8 @@ impl<S: Float> Quat<S> {
     }
 }
 
-impl<S: Float> ToMat3<S> for Quat<S> {
+impl<S: Float + ApproxEq<S>>
+ToMat3<S> for Quat<S> {
     /// Convert the quaternion to a 3 x 3 rotation matrix
     fn to_mat3(&self) -> Mat3<S> {
         let x2 = self.v.x + self.v.x;
@@ -290,7 +291,8 @@ impl<S: Float> ToMat3<S> for Quat<S> {
     }
 }
 
-impl<S: Float> Neg<Quat<S>> for Quat<S> {
+impl<S: Float + ApproxEq<S>>
+Neg<Quat<S>> for Quat<S> {
     #[inline]
     fn neg(&self) -> Quat<S> {
         Quat::from_sv(-self.s, -self.v)
