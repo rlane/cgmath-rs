@@ -16,7 +16,7 @@
 //! Column major, square matrix types and traits.
 
 use std::fmt;
-use std::num::{Zero, zero, One, one, cast, sqrt};
+use std::num::{Zero, zero, One, one, cast};
 
 use angle::{Rad, sin, cos, sin_cos};
 use approx::ApproxEq;
@@ -29,15 +29,15 @@ use partial_ord::PartOrdFloat;
 
 /// A 2 x 2, column major matrix
 #[deriving(Clone, Eq)]
-pub struct Mat2<S> { x: Vec2<S>, y: Vec2<S> }
+pub struct Mat2<S> { pub x: Vec2<S>, pub y: Vec2<S> }
 
 /// A 3 x 3, column major matrix
 #[deriving(Clone, Eq)]
-pub struct Mat3<S> { x: Vec3<S>, y: Vec3<S>, z: Vec3<S> }
+pub struct Mat3<S> { pub x: Vec3<S>, pub y: Vec3<S>, pub z: Vec3<S> }
 
 /// A 4 x 4, column major matrix
 #[deriving(Clone, Eq)]
-pub struct Mat4<S> { x: Vec4<S>, y: Vec4<S>, z: Vec4<S>, w: Vec4<S> }
+pub struct Mat4<S> { pub x: Vec4<S>, pub y: Vec4<S>, pub z: Vec4<S>, pub w: Vec4<S> }
 
 
 impl<S: Primitive> Mat2<S> {
@@ -684,7 +684,7 @@ ToQuat<S> for Mat3<S> {
         let half: S = cast(0.5).unwrap();
         match () {
             () if trace >= zero::<S>() => {
-                let s = sqrt(one::<S>() + trace);
+                let s = (one::<S>() + trace).sqrt();
                 let w = half * s;
                 let s = half / s;
                 let x = (*self.cr(1, 2) - *self.cr(2, 1)) * s;
@@ -693,7 +693,7 @@ ToQuat<S> for Mat3<S> {
                 Quat::new(w, x, y, z)
             }
             () if (*self.cr(0, 0) > *self.cr(1, 1)) && (*self.cr(0, 0) > *self.cr(2, 2)) => {
-                let s = sqrt(half + (*self.cr(0, 0) - *self.cr(1, 1) - *self.cr(2, 2)));
+                let s = (half + (*self.cr(0, 0) - *self.cr(1, 1) - *self.cr(2, 2))).sqrt();
                 let w = half * s;
                 let s = half / s;
                 let x = (*self.cr(0, 1) - *self.cr(1, 0)) * s;
@@ -702,7 +702,7 @@ ToQuat<S> for Mat3<S> {
                 Quat::new(w, x, y, z)
             }
             () if *self.cr(1, 1) > *self.cr(2, 2) => {
-                let s = sqrt(half + (*self.cr(1, 1) - *self.cr(0, 0) - *self.cr(2, 2)));
+                let s = (half + (*self.cr(1, 1) - *self.cr(0, 0) - *self.cr(2, 2))).sqrt();
                 let w = half * s;
                 let s = half / s;
                 let x = (*self.cr(0, 1) - *self.cr(1, 0)) * s;
@@ -711,7 +711,7 @@ ToQuat<S> for Mat3<S> {
                 Quat::new(w, x, y, z)
             }
             () => {
-                let s = sqrt(half + (*self.cr(2, 2) - *self.cr(0, 0) - *self.cr(1, 1)));
+                let s = (half + (*self.cr(2, 2) - *self.cr(0, 0) - *self.cr(1, 1))).sqrt();
                 let w = half * s;
                 let s = half / s;
                 let x = (*self.cr(2, 0) - *self.cr(0, 2)) * s;

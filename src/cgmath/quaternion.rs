@@ -14,7 +14,7 @@
 // limitations under the License.
 
 use std::fmt;
-use std::num::{zero, one, cast, sqrt};
+use std::num::{zero, one, cast};
 
 use angle::{Angle, Rad, acos, sin, sin_cos};
 use approx::ApproxEq;
@@ -27,7 +27,7 @@ use partial_ord::PartOrdFloat;
 
 /// A quaternion in scalar/vector form
 #[deriving(Clone, Eq)]
-pub struct Quat<S> { s: S, v: Vec3<S> }
+pub struct Quat<S> { pub s: S, pub v: Vec3<S> }
 
 array!(impl<S> Quat<S> -> [S, ..4] _4)
 
@@ -155,7 +155,7 @@ Quat<S> {
     /// it is advisable to use the `magnitude2` method instead.
     #[inline]
     pub fn magnitude(&self) -> S {
-        sqrt(self.magnitude2())
+        self.magnitude2().sqrt()
     }
 
     /// The normalized quaternion
